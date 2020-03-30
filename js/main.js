@@ -1,104 +1,113 @@
-let slides = document.querySelectorAll('.slides__item');
-let slideInterval = setInterval(nextSlide, 2000);
-let currentSlide = 0;
-let isPlaying = true;
-let pauseIcon = document.querySelector('#pause');
-let pauseButton = document.querySelector('.controls__pause');
-let nextButton = document.querySelector('#next');
-let previousButton = document.querySelector('#previous');
-let controls = document.querySelector('.controls');
-let indicatorsItems = document.querySelectorAll('.indicators__item');
-let indicators = document.querySelector('.indicators');
-let carousel = document.querySelector('.carousel');
+(function () {
 
-const SPACE = 32;
-const ARROW_RIGHT = 39;
-const ARROW_LEFT = 37;
+  //slider
+  let slides = document.querySelectorAll('.slides__item');
+  let slideInterval = setInterval(nextSlide, 2000);
+  let currentSlide = 0;
+  let isPlaying = true;
 
-controls.style.display = 'flex';
-indicators.style.display = 'flex';
+  //controls
+  let pauseIcon = document.querySelector('#pause');
+  let pauseButton = document.querySelector('.controls__pause');
+  let nextButton = document.querySelector('#next');
+  let previousButton = document.querySelector('#previous');
+  let controls = document.querySelector('.controls');
 
-function goToSlide(n) {
-  slides[currentSlide].classList.toggle('active');
-  indicatorsItems[currentSlide].classList.toggle('active');
-  currentSlide = (n + slides.length) % slides.length;
-  slides[currentSlide].classList.toggle('active');
-  indicatorsItems[currentSlide].classList.toggle('active');
-}
+  //indicators
+  let indicatorsItems = document.querySelectorAll('.indicators__item');
+  let indicators = document.querySelector('.indicators');
+  let carousel = document.querySelector('.carousel');
 
-function nextSlide() {
-  goToSlide(currentSlide + 1);
-}
+  //swipe
+  let swipeStartX = null;
+  let swipeEndX = null;
 
-function previousSlide() {
-  goToSlide(currentSlide - 1);
-}
+  //pressKey
+  const SPACE = 32;
+  const ARROW_RIGHT = 39;
+  const ARROW_LEFT = 37;
 
-function pauseSlideShow() {
-  pauseIcon.className = 'fas fa-play';
-  pauseButton.style.opacity = 1;
-  isPlaying = false;
-  clearInterval(slideInterval);
-}
+  //jsInit
+  controls.style.display = 'flex';
+  indicators.style.display = 'flex';
 
-function playSlideShow() {
-  pauseIcon.className = 'fas fa-pause';
-  pauseButton.style.removeProperty('opacity');
-  isPlaying = true;
-  slideInterval = setInterval(nextSlide, 2000);
-}
+  function goToSlide(n) {
+    slides[currentSlide].classList.toggle('active');
+    indicatorsItems[currentSlide].classList.toggle('active');
+    currentSlide = (n + slides.length) % slides.length;
+    slides[currentSlide].classList.toggle('active');
+    indicatorsItems[currentSlide].classList.toggle('active');
+  }
 
-function indicatorsSlide(event) {
-  let target = event.target;
+  function nextSlide() {
+    goToSlide(currentSlide + 1);
+  }
 
-  if (target.classList.contains('indicators__item')) {
+  function previousSlide() {
+    goToSlide(currentSlide - 1);
+  }
+
+  function pauseSlideShow() {
+    pauseIcon.className = 'fas fa-play';
+    pauseButton.style.opacity = 1;
+    isPlaying = false;
+    clearInterval(slideInterval);
+  }
+
+  function playSlideShow() {
+    pauseIcon.className = 'fas fa-pause';
+    pauseButton.style.removeProperty('opacity');
+    isPlaying = true;
+    slideInterval = setInterval(nextSlide, 2000);
+  }
+
+  function indicatorsSlide(event) {
+    let target = event.target;
+
+    if (target.classList.contains('indicators__item')) {
       pauseSlideShow();
       goToSlide(+target.getAttribute('data-slide-to'));
+    }
   }
-}
 
-function pressKey(event) {
-  if (isPlaying === false && event.keyCode === SPACE) playSlideShow();
-  else pauseSlideShow();
+  function pressKey(event) {
+    if (isPlaying === false && event.keyCode === SPACE) playSlideShow();
+    else pauseSlideShow();
 
-  if (event.keyCode === ARROW_RIGHT) nextSlide();
-  if (event.keyCode === ARROW_LEFT) previousSlide();
-}
+    if (event.keyCode === ARROW_RIGHT) nextSlide();
+    if (event.keyCode === ARROW_LEFT) previousSlide();
+  }
 
-indicators.addEventListener('click', indicatorsSlide);
+  indicators.addEventListener('click', indicatorsSlide);
 
-pauseButton.addEventListener('click', function() {
-  if (isPlaying) pauseSlideShow();
-  else playSlideShow();
-});
+  pauseButton.addEventListener('click', function () {
+    if (isPlaying) pauseSlideShow();
+    else playSlideShow();
+  });
 
-nextButton.addEventListener('click', function() {
-  pauseSlideShow();
-  nextSlide();
-});
+  nextButton.addEventListener('click', function () {
+    pauseSlideShow();
+    nextSlide();
+  });
 
-previousButton.addEventListener('click', function() {
-  pauseSlideShow();
-  previousSlide();
-});
+  previousButton.addEventListener('click', function () {
+    pauseSlideShow();
+    previousSlide();
+  });
 
-document.addEventListener('keydown', pressKey);
+  document.addEventListener('keydown', pressKey);
 
-let swipeStartX = null;
-let swipeEndX = null;
+  function swipeStart(event) {
+    swipeStartX = event.changedTouches[0].pageX;
+  }
 
-function swipeStart(event) {
-  swipeStartX = event.changedTouches[0].pageX;
-}
+  function swipeEnd(event) {
+    swipeEndX = event.changedTouches[0].pageX;
+    swipeStartX - swipeEndX > 100 && nextSlide();
+    swipeStartX - swipeEndX < -100 && previousSlide();
+  }
 
-function swipeEnd(event) {
-  swipeEndX = event.changedTouches[0].pageX;
-  swipeStartX - swipeEndX > 100 && nextSlide();
-  swipeStartX - swipeEndX < -100 && previousSlide();
-}
+  carousel.addEventListener('touchstart', swipeStart);
+  carousel.addEventListener('touchend', swipeEnd);
 
-carousel.addEventListener('touchstart', swipeStart);
-carousel.addEventListener('touchend', swipeEnd);
-
-
-
+}());
