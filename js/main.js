@@ -93,8 +93,8 @@ function swipeStart(event) {
 
 function swipeEnd(event) {
   swipeEndX = event.changedTouches[0].pageX;
-  swipeStartX - swipeEndX > 100 && previousSlide();
-  swipeStartX - swipeEndX < -100 && nextSlide();
+  swipeStartX - swipeEndX > 100 && nextSlide();
+  swipeStartX - swipeEndX < -100 && previousSlide();
 }
 
 carousel.addEventListener('touchstart', swipeStart);
